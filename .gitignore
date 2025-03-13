@@ -1,0 +1,15 @@
+﻿################################################################################
+# Este archivo .gitignore ha sido creado automáticamente por Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/PruebaTecnica
+/PruebaTecnica.API/bin/Debug/net8.0
+/PruebaTecnica.API/obj
+/PruebaTecnica.API/Properties
+/PruebaTecnica.API/PruebaTecnica.API.csproj.user
+/PruebaTecnica.Application/bin/Debug/net8.0
+/PruebaTecnica.Application/obj
+/PruebaTecnica.Domain/bin/Debug/net8.0
+/PruebaTecnica.Domain/obj
+/PruebaTecnica.Infrastructure/bin/Debug/net8.0
+/PruebaTecnica.Infrastructure/obj
