@@ -1,6 +1,22 @@
+using Microsoft.EntityFrameworkCore;
+using PruebaTecnica.Application.Mappings;
+using PruebaTecnica.Application.Repositories;
+using PruebaTecnica.Application.Services;
+using PruebaTecnica.Infrastructure.Context;
+using PruebaTecnica.Infrastructure.Repositories;
+using PruebaTecnica.Infrastructure.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddDbContext<ApplicationDBContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection")));
+
+builder.Services.AddAutoMapper(typeof(UserMappingProfile));
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRepository, Repository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
