@@ -8,6 +8,7 @@ namespace PruebaTecnica.Application.DTO
     /// </summary>
     public class UserDTO
     {
+        public int Id { get; set; }
         /// <summary>
         /// Nombre del usuario.
         /// Debe contener solo letras y tener una longitud máxima de 50 caracteres.

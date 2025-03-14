@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PruebaTecnica.Application.Common;
 using PruebaTecnica.Application.DTO;
 using PruebaTecnica.Application.Services;
@@ -10,6 +11,7 @@ using System.Net;
 
 namespace PruebaTecnica.API.Controllers
 {
+    //[Authorize]
     [ApiController]
     [Route("api/users")]
     public class UserController(IUserService userService) : ControllerBase
@@ -90,13 +92,14 @@ namespace PruebaTecnica.API.Controllers
         /// </summary>
         /// <param name="loginDto">DTO con correo y contraseña.</param>
         /// <returns>Mensaje de éxito o error.</returns>
+        [AllowAnonymous]
         [HttpPost("login")]
         [ProducesResponseType(typeof(ResponseMessage<string>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ResponseMessage<string>), (int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(ResponseMessage<string>), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<ResponseMessage<string>>> Login([FromBody] UserLoginDTO loginDto)
         {
-            var response = await _userService.LoginAsync(loginDto);
+            ResponseMessage<string> response = await _userService.LoginAsync(loginDto);
             return StatusCode((int)response.StatusCode, response);
         }
 

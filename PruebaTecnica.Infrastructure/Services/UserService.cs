@@ -11,10 +11,11 @@ using System.Net;
 
 namespace PruebaTecnica.Infrastructure.Services
 {
-    public class UserService(IRepository repository, IMapper mapper) : IUserService
+    public class UserService(IRepository repository, IMapper mapper, TokenService tokenService) : IUserService
     {
         private readonly IRepository _repository = repository;
         private readonly IMapper _mapper = mapper;
+        private readonly TokenService _tokenService = tokenService;
 
         /// <inheritdoc/>
         public async Task<ResponseMessage<UserDTO>> RegisterUserAsync(UserRegisterDTO userDto)
@@ -140,23 +141,23 @@ namespace PruebaTecnica.Infrastructure.Services
             }
         }
 
-        public async Task<ResponseMessage<string>> LoginAsync(UserLoginDTO loginDTO)
+        /// <inheritdoc/>
+        public async Task<ResponseMessage<string>> LoginAsync(UserLoginDTO loginDto)
         {
-            try
-            {
-                User user = await _repository.GetOneByWhereAsync<User>(u => u.Correo.Equals(loginDTO.Correo));
-                if (user is null)
-                    return ResponseMessage<string>.ErrorResponse("Correo o contraseña incorrectos.", HttpStatusCode.Unauthorized);
+            User user = await _repository.GetOneByWhereAsync<User>(u => u.Correo == loginDto.Correo);
 
-                if (!PasswordHelper.VerifyPassword(loginDTO.Password, user.PasswordHash, user.PasswordSalt))
-                    return ResponseMessage<string>.ErrorResponse("Correo o contraseña incorrectos.", HttpStatusCode.Unauthorized);
-
-                return ResponseMessage<string>.SuccessResponse("Inicio de sesión exitoso.");
-            }
-            catch (Exception ex)
+            if (user == null || !PasswordHelper.VerifyPassword(loginDto.Password, user.PasswordHash, user.PasswordSalt))
             {
-                return ResponseMessage<string>.ErrorResponse($"Error en el login: {ex.Message}", HttpStatusCode.InternalServerError);
+                return ResponseMessage<string>.ErrorResponse("Credenciales incorrectas.", HttpStatusCode.Unauthorized);
             }
-        }       
+
+            user.UltimoAcceso = DateTime.UtcNow;
+            await _repository.UpdateAsync(user.Id, user);
+
+            string token = _tokenService.GenerateToken(user);
+
+            return ResponseMessage<string>.SuccessResponse($"Bearer {token}", "Inicio de sesión exitoso");
+        }
+
     }
 }
